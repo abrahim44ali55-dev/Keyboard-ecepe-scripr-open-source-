@@ -136,14 +136,46 @@ t2.value29 = false
 t2.value30 = false
 t2.value31 = false
 t1.value6 = game.PlaceId
-t1.value22 = t1.value6 == 95082159892680
-t2.value32 = t1.value6 == 118941584817780
-t1.value20 = t1.value6 == 79464726993892 or t1.value6 == 93411036959889
-t1.value23 = t1.value22
-t2.value33 = t1.value20
-if not t1.value22 then
-    t1.value23 = t2.value32 or t2.value33
+local function DetectWorld2()
+    if workspace:FindFirstChild("WORLD 2") then
+        return true
+    end
+
+    return false
 end
+local function DetectWorld3()
+    if workspace:FindFirstChild("PersistentSpawn") or workspace:FindFirstChild("NPC_LolMonster") then
+        return true
+    end
+
+    local Structure = workspace:FindFirstChild("Structure")
+    local Stage1 = Structure and Structure:FindFirstChild("Stage1")
+    local SAS = Stage1 and Stage1:FindFirstChild("SAS")
+
+    return SAS and SAS:FindFirstChild("WinBlock31") ~= nil or false
+end
+local KnownWorld1 = t1.value6 == 95082159892680
+local KnownWorld2 = t1.value6 == 118941584817777 or t1.value6 == 118941584817780
+local KnownWorld3 = t1.value6 == 79464726993892 or t1.value6 == 93411036959889
+
+-- Prefer the exact PlaceId. Some worlds also contain a generic "Winblocks"
+-- folder, so using that folder alone incorrectly classified World 1 as World 2.
+if KnownWorld1 then
+    t2.value32 = false
+    t2.value33 = false
+elseif KnownWorld2 then
+    t2.value32 = true
+    t2.value33 = false
+elseif KnownWorld3 then
+    t2.value32 = false
+    t2.value33 = true
+else
+    t2.value32 = DetectWorld2()
+    t2.value33 = not t2.value32 and DetectWorld3() or false
+end
+
+t1.value22 = not t2.value32 and not t2.value33
+t1.value23 = t1.value22 or t2.value32 or t2.value33
 if t1.value23 then
 end
 t1.value29 = CFrame.new(15, 8.9, 296)
@@ -3037,7 +3069,7 @@ function t1.value45(p1)
             local Humanoid = Character2:FindFirstChildOfClass("Humanoid")
 
             if Humanoid then
-                value7 = math.min(Humanoid.WalkSpeed * 1.5, 260)
+                value7 = math.min(Humanoid.WalkSpeed * 1.5, 300)
 
                 if t2.value9 then
                     if t2.value9 and t2.value9.SetValue then
@@ -4454,7 +4486,7 @@ function t1.value66(p12)
 end
 t2.value9 = t1.value54(t1.value2, {
 	Title = "Tween Speed",
-	Description = "Set tween speed for auto win (25-260)",
+	Description = "Set tween speed for auto win (25-300)",
 	Max = 260,
 	Callback = t1.value66
 })
@@ -4464,7 +4496,7 @@ function t1.value65(p13)
 end
 t1.value2:Toggle({
 	Title = "Auto Calculate Tween Speed",
-	Description = "Automatically set tween speed based on WalkSpeed * 1.5 (max 260)",
+	Description = "Automatically set tween speed based on WalkSpeed * 1.5 (max 300)",
 	Default = false,
 	Callback = t1.value65
 })
