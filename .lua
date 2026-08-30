@@ -4471,7 +4471,7 @@ end
 t2.value9 = t1.value54(t1.value2, {
 	Title = "Tween Speed",
 	Description = "Set tween speed for auto win (25-350)",
-	Max = 350,
+	Max = 260,
 	Callback = t1.value66
 })
 t1.value54 = t2.value1
