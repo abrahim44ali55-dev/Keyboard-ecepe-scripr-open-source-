@@ -137,7 +137,7 @@ t2.value30 = false
 t2.value31 = false
 t1.value6 = game.PlaceId
 local function DetectWorld2()
-    if workspace:FindFirstChild("WORLD 2") then
+    if workspace:FindFirstChild("WORLD 2") or workspace:FindFirstChild("Winblocks") then
         return true
     end
 
@@ -154,26 +154,10 @@ local function DetectWorld3()
 
     return SAS and SAS:FindFirstChild("WinBlock31") ~= nil or false
 end
-local KnownWorld1 = t1.value6 == 95082159892680
 local KnownWorld2 = t1.value6 == 118941584817777 or t1.value6 == 118941584817780
 local KnownWorld3 = t1.value6 == 79464726993892 or t1.value6 == 93411036959889
-
--- Prefer the exact PlaceId. Some worlds also contain a generic "Winblocks"
--- folder, so using that folder alone incorrectly classified World 1 as World 2.
-if KnownWorld1 then
-    t2.value32 = false
-    t2.value33 = false
-elseif KnownWorld2 then
-    t2.value32 = true
-    t2.value33 = false
-elseif KnownWorld3 then
-    t2.value32 = false
-    t2.value33 = true
-else
-    t2.value32 = DetectWorld2()
-    t2.value33 = not t2.value32 and DetectWorld3() or false
-end
-
+t2.value32 = KnownWorld2 or DetectWorld2()
+t2.value33 = not t2.value32 and (KnownWorld3 or DetectWorld3()) or false
 t1.value22 = not t2.value32 and not t2.value33
 t1.value23 = t1.value22 or t2.value32 or t2.value33
 if t1.value23 then
@@ -3069,7 +3053,7 @@ function t1.value45(p1)
             local Humanoid = Character2:FindFirstChildOfClass("Humanoid")
 
             if Humanoid then
-                value7 = math.min(Humanoid.WalkSpeed * 1.5, 300)
+                value7 = math.min(Humanoid.WalkSpeed * 1.5, 350)
 
                 if t2.value9 then
                     if t2.value9 and t2.value9.SetValue then
@@ -4486,8 +4470,8 @@ function t1.value66(p12)
 end
 t2.value9 = t1.value54(t1.value2, {
 	Title = "Tween Speed",
-	Description = "Set tween speed for auto win (25-300)",
-	Max = 260,
+	Description = "Set tween speed for auto win (25-350)",
+	Max = 350,
 	Callback = t1.value66
 })
 t1.value54 = t2.value1
@@ -4496,7 +4480,7 @@ function t1.value65(p13)
 end
 t1.value2:Toggle({
 	Title = "Auto Calculate Tween Speed",
-	Description = "Automatically set tween speed based on WalkSpeed * 1.5 (max 300)",
+	Description = "Automatically set tween speed based on WalkSpeed * 1.5 (max 350)",
 	Default = false,
 	Callback = t1.value65
 })
