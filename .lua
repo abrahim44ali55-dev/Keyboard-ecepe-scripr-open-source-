@@ -135,33 +135,10 @@ t2.value28 = false
 t2.value29 = false
 t2.value30 = false
 t2.value31 = false
-t1.value6 = game.PlaceId
-local function DetectWorld2()
-    if workspace:FindFirstChild("WORLD 2") or workspace:FindFirstChild("Winblocks") then
-        return true
-    end
-
-    return false
-end
-local function DetectWorld3()
-    if workspace:FindFirstChild("PersistentSpawn") or workspace:FindFirstChild("NPC_LolMonster") then
-        return true
-    end
-
-    local Structure = workspace:FindFirstChild("Structure")
-    local Stage1 = Structure and Structure:FindFirstChild("Stage1")
-    local SAS = Stage1 and Stage1:FindFirstChild("SAS")
-
-    return SAS and SAS:FindFirstChild("WinBlock31") ~= nil or false
-end
-local KnownWorld2 = t1.value6 == 118941584817777 or t1.value6 == 118941584817780
-local KnownWorld3 = t1.value6 == 79464726993892 or t1.value6 == 93411036959889
-t2.value32 = KnownWorld2 or DetectWorld2()
-t2.value33 = not t2.value32 and (KnownWorld3 or DetectWorld3()) or false
-t1.value22 = not t2.value32 and not t2.value33
-t1.value23 = t1.value22 or t2.value32 or t2.value33
-if t1.value23 then
-end
+t1.value6 = tonumber(game.PlaceId)
+local WORLD_1_PLACE_ID = 95082159892680
+local WORLD_2_PLACE_ID = 118941584817777
+local WORLD_3_PLACE_ID = 93411036959889
 t1.value29 = CFrame.new(15, 8.9, 296)
 t1.value27 = {
 	CFrame = t1.value29,
@@ -2985,7 +2962,37 @@ t1.value25 = {
 	["Stage 14"] = t1.value53,
 	["Stage 15"] = t1.value55
 }
-t1.value27 = t2.value33 and t1.value25 or (t2.value32 and t1.value28 or t1.value23)
+local WORLD_CONFIGS = {
+    [WORLD_1_PLACE_ID] = {
+        Name = "World 1",
+        Coordinates = t1.value23,
+        IsWorld2 = false,
+        IsWorld3 = false
+    },
+    [WORLD_2_PLACE_ID] = {
+        Name = "World 2",
+        Coordinates = t1.value28,
+        IsWorld2 = true,
+        IsWorld3 = false
+    },
+    [WORLD_3_PLACE_ID] = {
+        Name = "World 3",
+        Coordinates = t1.value25,
+        IsWorld2 = false,
+        IsWorld3 = true
+    }
+}
+
+local CurrentWorldConfig = WORLD_CONFIGS[t1.value6]
+
+if not CurrentWorldConfig then
+    warn("Heartagram Hub: unsupported PlaceId " .. tostring(t1.value6) .. ". Using World 1 coordinates.")
+    CurrentWorldConfig = WORLD_CONFIGS[WORLD_1_PLACE_ID]
+end
+
+t2.value32 = CurrentWorldConfig.IsWorld2
+t2.value33 = CurrentWorldConfig.IsWorld3
+t1.value27 = CurrentWorldConfig.Coordinates
 t2.value34 = t1.value27
 function t1.value29()
     for _, v in pairs(t2.value13) do
@@ -3044,27 +3051,10 @@ function t1.value45(p1)
     end
 
     local Magnitude = (HumanoidRootPart.Position - p1.Position).Magnitude
-    local value7 = t2.value7
+    local value7 = math.clamp(tonumber(t2.value7) or 100, 25, 260)
+    t2.value7 = value7
 
-    if t2.value8 then
-        local Character2 = game.Players.LocalPlayer.Character
-
-        if Character2 then
-            local Humanoid = Character2:FindFirstChildOfClass("Humanoid")
-
-            if Humanoid then
-                value7 = math.min(Humanoid.WalkSpeed * 1.5, 350)
-
-                if t2.value9 then
-                    if t2.value9 and t2.value9.SetValue then
-                        t2.value9:SetValue(math.floor(value7))
-                    end
-                end
-            end
-        end
-    end
-
-    local v26 = Magnitude / value7
+    local v26 = math.max(Magnitude / value7, 0.03)
     local tweenInfo = TweenInfo.new(v26, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
     local t3 = {
 		CFrame = p1
@@ -4465,24 +4455,25 @@ t1.value2:Dropdown({
 t1.value53 = t2.value1
 t1.value54 = t1.value2.Slider
 function t1.value66(p12)
-    if not (p12 < 25) then
+    local newSpeed = tonumber(p12)
+
+    if newSpeed then
+        t2.value7 = math.clamp(math.floor(newSpeed + 0.5), 25, 260)
+
+        if t2.value14 then
+            t2.value14:Cancel()
+            t2.value14 = nil
+            t2.value15 = false
+        end
     end
 end
 t2.value9 = t1.value54(t1.value2, {
 	Title = "Tween Speed",
-	Description = "Set tween speed for auto win (25-350)",
+	Description = "Set tween speed for auto win (25-260)",
+	Min = 25,
 	Max = 260,
+	Default = 100,
 	Callback = t1.value66
-})
-t1.value54 = t2.value1
-function t1.value65(p13)
-    t2.value8 = p13
-end
-t1.value2:Toggle({
-	Title = "Auto Calculate Tween Speed",
-	Description = "Automatically set tween speed based on WalkSpeed * 1.5 (max 350)",
-	Default = false,
-	Callback = t1.value65
 })
 t1.value2:Section({
 	Title = "Killpart Remover",
